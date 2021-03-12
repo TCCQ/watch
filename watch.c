@@ -23,7 +23,7 @@ int main (int argc, char* argv[]) {
   desMod = 0x05;
   keyCode = 30; //initiate
   commandIndex = 0;
-  char action = 'p';
+  char action = 'a';
   char interpretFlags = 1;
   for (int i = 1; i < argc; i++) {//iterate over arguments
 
@@ -32,6 +32,12 @@ int main (int argc, char* argv[]) {
         interpretFlags = 0; //false
       } else { //is a regular flag for this program
         switch (argv[i][1]) {//no flag combinations
+          case 'h': //print help message
+            printf("This is a hotkey script for linux that does not depend on X running. usage is watch [-k keycode] [-m modifier list] [-p] [-h] [--] command \n -k keycode specifies the keycode of the trigger key. defaults to 30 (a) if not specified \n -p removes the normal operation and instead prints the keycode of keyboard input, use to infom your usage of -k\n -h prints this message\n -m specify the modifier keys required to trigger command. c=control s=shift m=meta a=alt. case insensitive. defaults to ca if not specified. eg. AMS or ams or aMs is alt+meta+shift.\n -- is nessiary before the command if the command you want to run includes flags, or arguments starting with a dash. \n example:\n sudo watch -k 32 -m sca -- echo -n \"key activated!\" '>>' /example/path/to/file.txt \n This would append to the file. put pipes, etc in quotes to prevent the interactive shell from interpreting them. the command is run via sh, so don't get too fancy.\n be aware that there is a 256 character limit on the command, so put things in a script and run that if need be. \n you will need to change the path to the keyboard event in the source, at the top, called 'device' if you steal this. Best of luck!\n");
+            return 0;
+          case 'p': //print keycodes instead
+            action = 'p';
+            break;
           case 'k': //set keycodes
             if (i+1 >= argc) {
               printf("Didn't specify a modifier combination, not enough arguments\n");
@@ -99,10 +105,10 @@ int main (int argc, char* argv[]) {
   while (1) {
     fread(&event, readsize, 1, kbd);
     if (event.type == EV_KEY) {
-//      if (action = 'p') {
-//        printf("type: %i \n code: %i \n value:  %i \n \n",event.type, event.code, event.value);
-//        continue;     
-//      }
+      if (action == 'p') {
+        printf("type: %i \n code: %i \n value:  %i \n \n",event.type, event.code, event.value);
+        continue;     
+      }
 
       switch (event.code) {
         case 42: //shift
